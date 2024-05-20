@@ -1,12 +1,13 @@
 import React from 'react'
 import Navbar from './component/client/Navbar'
-import MainSection from './component/client/MainSection'
+import { Outlet } from 'react-router-dom'
+import UserContextProvider2 from './context/UserContextProvider2'
 
 export default function Client() {
   return (
-    <div>
+   <UserContextProvider2>
         <Navbar/>
-        <MainSection/>
-    </div>
+        <Outlet/>
+   </UserContextProvider2>   
   )
 }

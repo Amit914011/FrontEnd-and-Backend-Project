@@ -1,24 +1,48 @@
-import React, { useEffect, useState } from "react";
-import {
-  BarChart,
-  Wallet,
-  Newspaper,
-  BellRing,
-  Paperclip,
-  Brush,
-  Wrench,
-} from "lucide-react";
+import React, { useContext, useEffect, useState } from "react";
+import { Navigation, Newspaper} from "lucide-react";
 import axios from "axios";
+import UserContext from "../../context/Usercontext";
 
 export default function MainSection() {
   let [data, setData] = useState([]);
+  let {setCartList}=useContext(UserContext)
   async function getData() {
     let result = await axios.get("http://localhost:3000/api/getData");
     setData(result.data);
   }
   useEffect(() => {
     getData();
+    getCartData();
+    
   }, []);
+
+  async function getCartData(){
+    let result= await axios.get("http://localhost:3000/api/cartGetData");
+    setCartList(result.data.length)
+    getData()
+  }
+
+  let {login}= useContext(UserContext)
+  async function addToCart(data){
+    if(login){
+      await axios.post('http://localhost:3000/api/cartSaveData',{
+        productName:data.productName,
+        productType:data.productType,
+        productPrice:data.productPrice,
+        productRating:data.productRating,
+        image:data.image,
+    },{
+      headers:{
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    alert('Item Save into Cart')
+    getCartData()
+  }else{
+    Navigation('/signin')
+  }
+}
+
 
   // let [searchData, setSearchData] = useState({
   //   search: "",
@@ -227,6 +251,7 @@ export default function MainSection() {
 
                 <button
                   type="button"
+                  onClick={()=>addToCart(data)}
                   className="mt-4 w-full rounded-sm bg-black px-2 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
                 >
                   Add +
